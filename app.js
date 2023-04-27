@@ -31,7 +31,7 @@ app.use(function (err, req, res, next) {
   return res.status(500).json({ error: err });
 });
 
-mongoose.connect("mongodb+srv://itek:itekpoc@userdatabase.ld2fnsq.mongodb.net/test", {
+mongoose.connect(process.env.MONGODB_URL, {
   useNewUrlParser: true,
   // useCreateIndex: true,
   useUnifiedTopology: true,
@@ -45,7 +45,6 @@ mongoose.connection.on("error", function (err) {
 mongoose.connection.on("connected", function () {
   console.log(
     "connection successfull!!!",
-    "mongodb://localhost:27017/userDataBase"
   );
   app.listen(process.env.PORT || 5000);
 });
