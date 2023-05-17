@@ -14,6 +14,10 @@ const crimeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  state: {
+    type: String,
+    required: true,
+  },
   telephoneNo: {
     type: String,
     required: true,

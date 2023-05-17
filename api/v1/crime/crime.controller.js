@@ -9,6 +9,7 @@ static create(req, res, next) {
         uniqueCrimeNo:uniqueCrimeNo,
         caseReportedBy:req.body.crName,
         address:req.body.crAddress,
+        state:req.body.crState,
         telephoneNo:req.body.crTelephone,
         meansOfIdentification:req.body.crIdentification,
         identificationNo:req.body.crIdentificationNo,
@@ -88,30 +89,35 @@ static async getCrimeDetails(req, res, next) {
       throw new Error("Please provide at least one search parameter.");
     }
   
-    const searchQuery = {};
+    const searchQuery = [];
   
     if (uniqueCrimeNo && uniqueCrimeNo!='undefined') {
-      searchQuery.uniqueCrimeNo = uniqueCrimeNo;
+      searchQuery.push({ uniqueCrimeNo: uniqueCrimeNo});
     }
     if (dateOfCrime && dateOfCrime!='undefined') {
-      searchQuery.dateOfCrime = dateOfCrime;
+      //searchQuery.dateOfCrime = dateOfCrime;
+      searchQuery.push({ dateOfCrime: dateOfCrime});
     }
     if (caseReportedBy && caseReportedBy!='undefined') {
-      searchQuery.caseReportedBy = caseReportedBy;
-    }
+      //searchQuery.caseReportedBy = caseReportedBy;
+      searchQuery.push({$or:[{caseReportedBy:{ '$regex' : caseReportedBy, '$options' : 'i' }},{witnessedBy:{ '$regex' : caseReportedBy, '$options' : 'i' }}]});
+   }
     if (dateReported && dateReported!='undefined'){
       searchQuery.dateReported = dateReported;
     }
-    if (typeOfCrime && typeOfCrime!='undefined') {
-      searchQuery.typeOfCrime = typeOfCrime;
+    if (typeOfCrime && typeOfCrime!='undefined' && typeOfCrime!='DEFAULT') {
+      //searchQuery.typeOfCrime = typeOfCrime;
+      searchQuery.push({ typeOfCrime: typeOfCrime});
     }
     console.log(searchQuery)
     
     try {
       // if (caseReportedBy && caseReportedBy!='undefined') {
-      //    const crimeDetails = await Crime.find({$and: [{searchQuery},{$or: [{witnessedBy:caseReportedBy},{officerOnDuty:caseReportedBy},{caseAssignedTo:caseReportedBy},{closedBy:caseReportedBy},{approvedBy:caseReportedBy},{caseReportedBy:caseReportedBy}]}] });
+       
+         const crimeDetails = await Crime.find({$and: searchQuery});
+        // const crimeDetails = await Crime.find({$or: [{searchQuery},{$and: [{witnessedBy:{ '$regex' : caseReportedBy, '$options' : 'i' }},{caseReportedBy:{ '$regex' : caseReportedBy, '$options' : 'i' }}]}] });
       // }else{
-        const crimeDetails = await Crime.find(searchQuery);
+       // const crimeDetails = await Crime.find(searchQuery);
       //}
       console.log(crimeDetails)
   
